@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>哥哥就在这里。</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background: #0a0c0e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: "Microsoft YaHei", "Segoe UI", system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .phone-frame {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 9 / 16;
+            background-color: #1a1e24;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            border-radius: 0;
+            margin: 0 auto;
+        }
+
+        .bg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('back/back.png') no-repeat center center / cover;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .game-layer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .dialog-box {
+            background: #ece9d8;
+            border: 3px solid #0044cc;
+            border-radius: 8px 8px 4px 4px;
+            box-shadow: 4px 4px 12px rgba(0,0,0,0.6);
+            width: 100%;
+            max-width: 340px;
+            margin: 0 auto;
+            padding: 0 0 12px 0;
+            font-size: 14px;
+            color: #1e1e1e;
+            transition: opacity 0.2s ease;
+            position: relative;
+            background: #f0f0ea;
+        }
+
+        .dialog-title {
+            background: linear-gradient(90deg, #0a246a, #1a3a8a);
+            color: white;
+            padding: 8px 12px;
+            font-weight: bold;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            border-radius: 4px 4px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 2px solid #0a1a5a;
+        }
+
+        .dialog-title span {
+            background: #c0c0c0;
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+            border-radius: 2px;
+            margin-right: 6px;
+            border: 1px solid #888;
+        }
+
+        .dialog-body {
+            padding: 16px 14px 10px 14px;
+            line-height: 1.6;
+            font-size: 15px;
+            min-height: 80px;
+            word-break: break-word;
+        }
+
+        .dialog-body img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+            margin: 10px auto 8px auto;
+            border-radius: 6px;
+            border: 1px solid #b0b0a0;
+            background: #ddd;
+        }
+
+        .dialog-options {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 6px 14px 4px 14px;
+            flex-wrap: wrap;
+        }
+
+        .dialog-options button {
+            background: #d4d0c8;
+            border: 2px solid #a0a0a0;
+            border-radius: 4px;
+            padding: 6px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a1a;
+            box-shadow: 1px 1px 0px #ffffff inset, -1px -1px 0px #808080 inset;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            min-width: 70px;
+            background: #e0ddd0;
+            letter-spacing: 0.3px;
+        }
+
+        .dialog-options button:active {
+            background: #c0bdb0;
+            box-shadow: -1px -1px 0px #ffffff inset, 1px 1px 0px #808080 inset;
+            transform: translate(1px, 1px);
+        }
+
+        .crash-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .glitch-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, 
+                rgba(0,255,0,0.1) 0px, 
+                rgba(255,0,255,0.1) 2px, 
+                rgba(0,0,255,0.2) 4px,
+                rgba(255,255,0,0.15) 6px,
+                rgba(0,255,255,0.1) 8px);
+            mix-blend-mode: overlay;
+            animation: glitchFlick 0.08s infinite alternate;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        @keyframes glitchFlick {
+            0% { opacity: 0.7; transform: scale(1.01) rotate(0.2deg); }
+            100% { opacity: 1; transform: scale(1.02) rotate(-0.2deg); }
+        }
+
+        .blue-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a2a8a;
+            color: #ffffff;
+            font-family: 'Lucida Console', 'Courier New', monospace;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: left;
+            z-index: 1100;
+            pointer-events: auto;
+            box-sizing: border-box;
+            border: 6px solid #b0d0ff;
+        }
+
+        .blue-screen pre {
+            font-size: 12px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-width: 100%;
+            color: #e0f0ff;
+            text-shadow: 0 0 4px #88ccff;
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 6px;
+            width: 100%;
+            border-left: 3px solid #aaccff;
+        }
+
+        .blue-screen h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-shadow: 0 0 10px #88ddff;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.25s ease;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0.5; transform: scale(0.96); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 420px) {
+            .dialog-box { max-width: 100%; }
+            .dialog-body { font-size: 14px; padding: 12px 12px 8px; }
+            .dialog-options button { padding: 5px 12px; font-size: 13px; min-width: 60px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="phone-frame" id="gameContainer">
+    <div class="bg-layer"></div>
+
+    <div class="game-layer" id="gameLayer">
+        <div id="dialogContainer" style="width:100%; display:flex; justify-content:center; align-items:center; flex-direction:column;"></div>
+    </div>
+
+    <div id="crashContainer" class="crash-overlay hidden">
+        <div class="glitch-effect" id="glitchEffect"></div>
+        <div class="blue-screen" id="blueScreen">
+            <h2>系统错误</h2>
+            <pre>
+    此为永不消逝的怀念。
+
+    A problem has been detected and windows has been shut down to prevent damage to your heart.
+
+    MEMORY_MANAGEMENT_ERROR
+    *** 0x0000FFFF (0x00000000, 0x00000000, 0x00000000)
+
+    正在转储记忆……
+    物理内存： 时空中的绘旅人
+    核心文件： 世界与你.dmp
+
+    重启系统？
+    但你知道，哥哥就在这里。
+            </pre>
+            <div style="margin-top: 16px; color: #88ddff; font-size: 13px; border-top: 1px solid #4477bb; padding-top: 8px; width: 80%; text-align: center;">
+                按任意处继续 · 但窗口已无法关闭
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const state = {
+            step: 'start' // start, dialog1_left, dialog1_right, dialog2, dialog3, crash
+        };
+
+        const container = document.getElementById('dialogContainer');
+        const crashContainer = document.getElementById('crashContainer');
+        const gameLayer = document.getElementById('gameLayer');
+
+        function renderDialog(title, bodyHTML, options) {
+            container.innerHTML = `
+                <div class="dialog-box fade-in">
+                    <div class="dialog-title">
+                        <span></span> ${title}
+                    </div>
+                    <div class="dialog-body">
+                        ${bodyHTML}
+                    </div>
+                    <div class="dialog-options">
+                        ${options.map((opt, idx) => `<button data-optindex="${idx}">${opt.label}</button>`).join('')}
+                    </div>
+                </div>
+            `;
+            const btns = container.querySelectorAll('.dialog-options button');
+            btns.forEach((btn, index) => {
+                btn.addEventListener('click', function(e) {
+                    const opt = options[index];
+                    if (opt.action) opt.action();
+                });
+            });
+        }
+
+        let audio = null;
+        function initMusic() {
+            try {
+                audio = new Audio('music/music.mp3');
+                audio.loop = true;
+                audio.volume = 0.5;
+                audio.play().catch(e => {
+                    console.warn('音乐自动播放被阻止，等待用户交互');
+                });
+            } catch(e) {
+                console.warn('音乐加载失败', e);
+            }
+        }
+
+        function tryPlayMusic() {
+            if (audio) {
+                if (audio.paused) {
+                    audio.play().catch(()=>{});
+                }
+            } else {
+                initMusic();
+            }
+        }
+
+        window.addEventListener('load', function() {
+            initMusic();
+            showDialog1();
+        });
+
+        document.addEventListener('click', function() {
+            tryPlayMusic();
+        }, { once: false });
+        document.addEventListener('touchstart', function() {
+            tryPlayMusic();
+        }, { once: false });
+
+//对话框从这里开始
+        function showDialog1() {
+            state.step = 'start';
+            renderDialog(
+                '你过得好吗',
+                '最近生活如何',
+                [
+                    { label: '不好', action: function() { 
+                        tryPlayMusic();
+                        showDialog1_left(); 
+                    } },
+                    { label: '挺好的', action: function() { 
+                        tryPlayMusic();
+                        showDialog1_right(); 
+                    } }
+                ]
+            );
+        }
+
+        function showDialog1_left() {
+            state.step = 'dialog1_left';
+            const body = `原来我的妹妹在那个世界受欺负了<br>真自责我没有及时出现在你身边`;
+            renderDialog(
+                '感同身受的痛苦',
+                body,
+                [
+                    { label: '能应付', action: function() { 
+                        tryPlayMusic();
+                        showDialog2(); 
+                    } }
+                ]
+            );
+        }
+
+        function showDialog1_right() {
+            state.step = 'dialog1_right';
+            renderDialog(
+                '安心',
+                '很高兴能听到这个消息',
+                [
+                    { label: '好的', action: function() { 
+                        tryPlayMusic();
+                        showDialog2(); 
+                    } }
+                ]
+            );
+        }
+
+        function showDialog2() {
+            state.step = 'dialog2';
+            const body = `哥哥在这里过得也很好，不必挂念<br><img src="lihui/1.png" alt="插图" style="max-width:100%;" onerror="this.style.display='none'">`;
+            renderDialog(
+                '我的生活',
+                body,
+                [
+                    { label: '好的', action: function() { 
+                        tryPlayMusic();
+                        showDialog3(); 
+                    } }
+                ]
+            );
+        }
+
+        function showDialog3() {
+            state.step = 'dialog3';
+            const body = `能借此窗口再见你一面已经超出我的预期<br>当你想念我时<br>我就在这里<br>永远爱你`;
+            renderDialog(
+                '永不消逝的想念',
+                body,
+                [
+                    { label: '好的', action: function() { 
+                        tryPlayMusic();
+                        triggerCrash(); 
+                    } }
+                ]
+            );
+        }
+
+        function triggerCrash() {
+            state.step = 'crash';
+            container.innerHTML = '';
+            crashContainer.classList.remove('hidden');
+            const blueScreen = document.getElementById('blueScreen');
+            blueScreen.addEventListener('click', function resetGame() {
+                crashContainer.classList.add('hidden');
+                if (audio) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    audio.play().catch(()=>{});
+                }
+                showDialog1();
+            }, { once: true });
+            crashContainer.addEventListener('click', function(e) {
+                if (e.target === crashContainer || e.target === document.getElementById('glitchEffect')) {
+                }
+            });
+        }
+
+        console.log('dreamUUUU 游戏启动。背景、音乐、插图文件夹需存在: back/back.png, music/music.mp3, lihui/1.png');
+    })();
+</script>
+</body>
+</html>
